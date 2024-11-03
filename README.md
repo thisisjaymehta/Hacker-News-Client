@@ -29,3 +29,11 @@ No license, take what you need.
 ## Contact
 
 [jaymehta7600@gmail.com](mailto:jaymehta7600@gmail.com)
+
+## Screenshots
+
+| OS      | Screenshot                                        |
+|---------|---------------------------------------------------|
+| Windows | <img src="/screenshots/windows.png" width="100%"> |
+| Android | <img src="/screenshots/android.png" width="50%">  |
+

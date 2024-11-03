@@ -25,6 +25,7 @@ class HackerNewsApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       home: const HomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
