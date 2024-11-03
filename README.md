@@ -32,8 +32,9 @@ No license, take what you need.
 
 ## Screenshots
 
-| OS      | Screenshot                                        |
-|---------|---------------------------------------------------|
-| Windows | <img src="/screenshots/windows.png" width="100%"> |
-| Android | <img src="/screenshots/android.png" width="50%">  |
-
+| OS      | Screenshot                                         |
+|---------|----------------------------------------------------|
+| Windows | <img src="/screenshots/windows.png" width="100%">  |
+| macOS   | <img src="/screenshots/macos.png" width="100%">    |
+| Android | <img src="/screenshots/android.png" width="50%">   |
+| iOS     | <img src="/screenshots/ios-light.png" width="50%"> |
