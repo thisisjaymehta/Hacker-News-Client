@@ -1,4 +1,3 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -9,8 +8,22 @@ void main() {
   runApp(const HackerNewsApp());
 }
 
-class HackerNewsApp extends StatelessWidget {
-  const HackerNewsApp({Key? key}) : super(key: key);
+class HackerNewsApp extends StatefulWidget {
+  const HackerNewsApp({super.key});
+
+  @override
+  State<HackerNewsApp> createState() => _HackerNewsAppState();
+}
+
+class _HackerNewsAppState extends State<HackerNewsApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _toggleTheme() {
+    setState(() {
+      _themeMode =
+          _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,19 +32,27 @@ class HackerNewsApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.orange,
         brightness: Brightness.light,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 1,
+        ),
       ),
       darkTheme: ThemeData(
         primarySwatch: Colors.orange,
         brightness: Brightness.dark,
       ),
-      home: const HomePage(),
+      themeMode: _themeMode,
+      home: HomePage(onThemeToggle: _toggleTheme),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final VoidCallback onThemeToggle;
+
+  const HomePage({Key? key, required this.onThemeToggle}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -56,7 +77,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 500) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 500) {
       _loadMoreStories();
     }
   }
@@ -81,7 +103,8 @@ class _HomePageState extends State<HomePage> {
 
     try {
       if (initial) {
-        final endpoint = _currentTab == 'jobs' ? 'jobstories' : '${_currentTab}stories';
+        final endpoint =
+            _currentTab == 'jobs' ? 'jobstories' : '${_currentTab}stories';
         final response = await http.get(
           Uri.parse('https://hacker-news.firebaseio.com/v0/$endpoint.json'),
         );
@@ -134,7 +157,9 @@ class _HomePageState extends State<HomePage> {
 
       if (mounted) {
         setState(() {
-          _stories.addAll(results.where((story) => story != null).cast<Map<String, dynamic>>());
+          _stories.addAll(results
+              .where((story) => story != null)
+              .cast<Map<String, dynamic>>());
           _isLoading = false;
           _hasMoreStories = _stories.length < _storyIds.length;
         });
@@ -173,13 +198,15 @@ class _HomePageState extends State<HomePage> {
     final author = story['by'] ?? 'unknown';
     final score = story['score'] ?? 0;
     final commentCount = story['descendants'] ?? 0;
-    final time = DateTime.fromMillisecondsSinceEpoch((story['time'] ?? 0) * 1000);
+    final time =
+        DateTime.fromMillisecondsSinceEpoch((story['time'] ?? 0) * 1000);
     final url = story['url'];
     final id = story['id'];
 
     return Card(
       margin: const EdgeInsets.all(8.0),
-      child: IntrinsicHeight(  // This ensures both sides have same height
+      child: IntrinsicHeight(
+        // This ensures both sides have same height
         child: Row(
           children: [
             // Main content area - clickable
@@ -193,9 +220,10 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Text(
                         title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const SizedBox(height: 8.0),
                       SingleChildScrollView(
@@ -206,7 +234,8 @@ class _HomePageState extends State<HomePage> {
                             const SizedBox(width: 16),
                             _buildInfoItem(Icons.person, author),
                             const SizedBox(width: 16),
-                            _buildInfoItem(Icons.access_time, timeago.format(time)),
+                            _buildInfoItem(
+                                Icons.access_time, timeago.format(time)),
                           ],
                         ),
                       ),
@@ -306,6 +335,12 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Hacker News'),
         actions: [
           IconButton(
+            icon: Icon(Theme.of(context).brightness == Brightness.light
+                ? Icons.dark_mode
+                : Icons.light_mode),
+            onPressed: widget.onThemeToggle,
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _isLoading ? null : _refreshStories,
           ),
@@ -388,8 +423,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildTabBar() {
+    final brightness = Theme.of(context).brightness;
+    final isLight = brightness == Brightness.light;
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+
     return Container(
-      color: Theme.of(context).primaryColor,
+      color: isLight ? backgroundColor : Theme.of(context).primaryColor,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -416,10 +455,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildTabButton(String tab, String label) {
+    final brightness = Theme.of(context).brightness;
+    final isLight = brightness == Brightness.light;
+
     return TextButton(
       onPressed: _isLoading ? null : () => _changeTab(tab),
       style: TextButton.styleFrom(
-        foregroundColor: _currentTab == tab ? Colors.white : Colors.white70,
+        foregroundColor: _currentTab == tab
+            ? (isLight ? Colors.orange : Colors.white)
+            : (isLight ? Colors.black54 : Colors.white70),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
